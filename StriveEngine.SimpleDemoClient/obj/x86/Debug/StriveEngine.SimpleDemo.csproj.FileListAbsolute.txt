@@ -1,0 +1,9 @@
+D:\Project\2.Demo\StriveEngine.SimpleDemo\StriveEngine.SimpleDemo\bin\Debug\StriveEngine.SimpleDemo.exe
+D:\Project\2.Demo\StriveEngine.SimpleDemo\StriveEngine.SimpleDemo\bin\Debug\StriveEngine.SimpleDemo.pdb
+D:\Project\2.Demo\StriveEngine.SimpleDemo\StriveEngine.SimpleDemo\obj\x86\Debug\ResolveAssemblyReference.cache
+D:\Project\2.Demo\StriveEngine.SimpleDemo\StriveEngine.SimpleDemo\obj\x86\Debug\StriveEngine.SimpleDemo.Form1.resources
+D:\Project\2.Demo\StriveEngine.SimpleDemo\StriveEngine.SimpleDemo\obj\x86\Debug\StriveEngine.SimpleDemo.Properties.Resources.resources
+D:\Project\2.Demo\StriveEngine.SimpleDemo\StriveEngine.SimpleDemo\obj\x86\Debug\ResGen.read.1.tlog
+D:\Project\2.Demo\StriveEngine.SimpleDemo\StriveEngine.SimpleDemo\obj\x86\Debug\ResGen.write.1.tlog
+D:\Project\2.Demo\StriveEngine.SimpleDemo\StriveEngine.SimpleDemo\obj\x86\Debug\StriveEngine.SimpleDemo.exe
+D:\Project\2.Demo\StriveEngine.SimpleDemo\StriveEngine.SimpleDemo\obj\x86\Debug\StriveEngine.SimpleDemo.pdb

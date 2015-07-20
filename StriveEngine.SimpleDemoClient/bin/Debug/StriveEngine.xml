@@ -1,0 +1,1539 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>StriveEngine</name>
+    </assembly>
+    <members>
+        <member name="T:StriveEngine.Tcp.Passive.PassiveBaseTcpEngine">
+            <summary>
+            客户端的Tcp引擎，通过ContractFormatStyle属性指定采用的协议类型。
+            </summary>
+        </member>
+        <member name="T:StriveEngine.Tcp.Passive.ITcpPassiveEngine">
+            <summary>
+            客户端TCP引擎接口。 
+            </summary>
+        </member>
+        <member name="T:StriveEngine.Core.IPassiveEngine">
+            <summary>
+            客户端引擎接口。
+            </summary>
+        </member>
+        <member name="T:StriveEngine.Core.INetworkEngine">
+            <summary>
+            所有网络引擎（包括服务端引擎、客户端引擎、TCP引擎、UDP引擎、二进制引擎、文本引擎）的基础接口。    
+            </summary>
+        </member>
+        <member name="M:StriveEngine.Core.INetworkEngine.Initialize">
+            <summary>
+            初始化并启动网络引擎。如果修改了引擎配置参数，在应用新参数之前必须先重新调用该方法初始化引擎。
+            </summary>
+        </member>
+        <member name="M:StriveEngine.Core.INetworkEngine.DisposeAsyn">
+            <summary>
+            当不再使用当前引擎实例时，释放它。（异步方式）
+            注意：对于UDP或客户端引擎，如果消息是同步处理的(HandleMessageAsynchronismly为false)，请不要在消息处理器中调用Dispose方法，否则，会导致死锁。因为停止引擎要等到最后一条消息处理完毕才会返回。
+            可以转向调用异步的DisposeAsyn方法。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Core.INetworkEngine.ProtocolType">
+            <summary>            
+            传输层协议类型，TCP或UDP
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Core.INetworkEngine.CreateTime">
+            <summary>
+            引擎实例的创建时间。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Core.INetworkEngine.Port">
+            <summary>
+            表示要监听本地的哪个端口。如果设定其值小于等于0，则表示由系统自动分配。      
+            注意，引擎初始化完成后，不能再修改该属性。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Core.INetworkEngine.IPAddress">
+            <summary>
+            对于服务端引擎，表示要绑定本地的哪个IP，如果设为null，则表示绑定本地所有IP。
+            对于客户端引擎，表示要绑定本地的哪个IP与服务器进行通信。如果设为null（其值会在初始化完成后被修改），则自动选择地址列表中的某一个。
+            注意，引擎初始化完成后，不能再修改该属性。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Core.INetworkEngine.LogFilePath">
+            <summary>
+            设置日志记录的文件路径。如果设为null，表示不记录日志。默认值为null。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Core.INetworkEngine.SocketSendBuffSize">
+            <summary>
+            Socket(网卡)发送缓冲区的大小。默认为8k。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Core.INetworkEngine.SocketReceiveBuffSize">
+            <summary>
+            Socket(网卡)接收缓冲区的大小。默认为8k。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Core.INetworkEngine.MaxMessageSize">
+            <summary>
+            网络引擎能够接收的最大的消息尺寸。据此网络引擎可以为每个Session/Connection开辟适当大小的接收缓冲区。
+            默认为1k。当接收到的消息尺寸超过MaxMessageSize时，将会关闭对应的连接（对TCP）或丢弃数据（对UDP）。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Core.INetworkEngine.Disposed">
+            <summary>
+            引擎实例是否已经被释放。
+            </summary>
+        </member>
+        <member name="E:StriveEngine.Core.INetworkEngine.EngineDisposed">
+            <summary>
+            当引擎实例被释放时，触发此事件。
+            </summary>
+        </member>
+        <member name="E:StriveEngine.Core.INetworkEngine.MessageReceived">
+            <summary>
+            接收到一个完整的消息时触发该事件。
+            </summary>
+        </member>
+        <member name="E:StriveEngine.Core.INetworkEngine.MessageSent">
+            <summary>
+            将消息成功发送之后触发该事件
+            </summary>
+        </member>
+        <member name="M:StriveEngine.Core.IPassiveEngine.SendMessageToServer(System.Byte[],StriveEngine.ActionTypeOnChannelIsBusy)">
+            <summary>
+            将消息同步发送给服务器，不经任何处理，直接发送。注意：如果引擎已经停止，则直接返回。   
+            </summary>
+            <param name="msg">要发送的消息</param>
+            <param name="action">当通道繁忙时采取的动作：继续发送或丢弃。</param>
+        </member>
+        <member name="M:StriveEngine.Core.IPassiveEngine.SendMessageToServer(System.Byte[])">
+            <summary>
+            将消息同步发送给服务器，不经任何处理，直接发送。注意：如果引擎已经停止，则直接返回。   
+            </summary>
+            <param name="msg">要发送的消息</param>       
+        </member>
+        <member name="M:StriveEngine.Core.IPassiveEngine.PostMessageToServer(System.Byte[],StriveEngine.ActionTypeOnChannelIsBusy)">
+            <summary>
+            将消息异步发送给服务器，不经任何处理，直接发送。注意：如果引擎已经停止，则直接返回。   
+            </summary>
+            <param name="msg">要发送的消息</param>
+            <param name="action">当通道繁忙时采取的动作：继续发送或丢弃。</param>
+        </member>
+        <member name="M:StriveEngine.Core.IPassiveEngine.PostMessageToServer(System.Byte[])">
+            <summary>
+            将消息异步发送给服务器，不经任何处理，直接发送。注意：如果引擎已经停止，则直接返回。   
+            </summary>
+            <param name="msg">要发送的消息</param>       
+        </member>
+        <member name="P:StriveEngine.Core.IPassiveEngine.ServerIPEndPoint">
+            <summary>
+            服务器地址。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Core.IPassiveEngine.ChannelIsBusy">
+            <summary>
+            发送消息的通道是否正忙。使用者可以根据该属性决定是否要丢弃后续某些消息的发送。
+            </summary>
+        </member>
+        <member name="M:StriveEngine.Tcp.Passive.ITcpPassiveEngine.CloseConnection">
+            <summary>
+            主动关闭与服务器的连接。如果AutoReconnect为true，将引发自动重连。
+            </summary>
+        </member>
+        <member name="M:StriveEngine.Tcp.Passive.ITcpPassiveEngine.Reconnect(System.Int32,System.Int32)">
+            <summary>
+            手动重连。如果当前处于连接状态，则直接返回。
+            </summary>
+            <param name="retryCount">重试次数</param>
+            <param name="retrySpanInMSecs">重试间隔时间，毫秒</param>
+        </member>
+        <member name="P:StriveEngine.Tcp.Passive.ITcpPassiveEngine.ContractFormatStyle">
+            <summary>
+            引擎所采用的协议类型（二进制、文本）。
+            </summary>
+        </member>
+        <member name="E:StriveEngine.Tcp.Passive.ITcpPassiveEngine.ConnectionInterrupted">
+            <summary>
+            当客户端与服务器的TCP连接断开时，将触发此事件。
+            </summary>
+        </member>
+        <member name="E:StriveEngine.Tcp.Passive.ITcpPassiveEngine.ConnectionRebuildStart">
+            <summary>
+            自动重连开始时，触发此事件。
+            </summary>
+        </member>
+        <member name="E:StriveEngine.Tcp.Passive.ITcpPassiveEngine.ConnectionRebuildSucceed">
+            <summary>
+            自动重连成功后，触发此事件。
+            </summary>
+        </member>
+        <member name="E:StriveEngine.Tcp.Passive.ITcpPassiveEngine.ConnectionRebuildFailure">
+            <summary>
+            自动重连超过最大重试次数时，表明重连失败，将触发此事件。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Passive.ITcpPassiveEngine.Sock5ProxyInfo">
+            <summary>
+            Sock5代理服务器信息。如果不需要代理，则设置为null。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Passive.ITcpPassiveEngine.Connected">
+            <summary>
+            当前是否处于连接状态。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Passive.ITcpPassiveEngine.AutoReconnect">
+            <summary>
+            当与服务器断开连接时，是否自动重连。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Passive.ITcpPassiveEngine.MaxRetryCount4AutoReconnect">
+            <summary>
+            当连接断开时，自动重连尝试的最大次数。默认值为int.MaxValue。
+            </summary>
+        </member>
+        <member name="M:StriveEngine.Tcp.Passive.PassiveBaseTcpEngine.CloseConnection">
+            <summary>
+            主动关闭与服务器的连接。如果AutoReconnect为true，将引发自动重连。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Passive.PassiveBaseTcpEngine.MaxMessageSize">
+            <summary>
+            ReceiveBuffSize 应用程序开辟的接收缓冲区的大小。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Passive.PassiveBaseTcpEngine.Sock5ProxyInfo">
+            <summary>
+            Sock5代理服务器信息
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Passive.PassiveBaseTcpEngine.IPAddress">
+            <summary>
+            绑定当前哪个IP地址。如果为null，则自动选择地址列表中的第一个。
+            </summary>
+        </member>
+        <member name="T:StriveEngine.Udp.UdpEngine">
+            <summary>
+            UdpEngine Udp引擎的基类，支持增强型的UDP。由ContractFormatStyle属性指定采用的协议类型。
+            注意：理论上网络支持的最大的udp数据报为65507(64k减去各协议头)，由MaxUdpDatagramSize常量表示。 
+            MaxUdpDatagramLength 属性可以设置拆分后得到的UDP数据报的最大尺寸。当要发送的消息大于MaxUdpDatagramLength时，BaseUdpEngine会将其拆分为多个小的UDP数据报发送（异步发送不会拆分消息）。
+            zhuweisky 2007.04.06
+            </summary>
+        </member>
+        <member name="T:StriveEngine.Udp.IUdpEngine">
+            <summary>
+            Udp引擎基础接口。
+            </summary>
+        </member>
+        <member name="M:StriveEngine.Udp.IUdpEngine.SendMessage(System.Net.IPEndPoint,System.Byte[])">
+            <summary>
+            向指定的端点发送UDP消息。注意：如果引擎已经停止，则直接返回。
+            </summary>
+            <param name="message">要发送的消息</param>
+            <param name="address">目标端点</param>           
+        </member>
+        <member name="M:StriveEngine.Udp.IUdpEngine.PostMessage(System.Net.IPEndPoint,System.Byte[])">
+            <summary>
+            向指定的端点投递UDP消息。注意：如果引擎已经停止，则直接返回。
+            </summary>
+            <param name="message">要投递的消息</param>
+            <param name="address">目标端点</param>           
+        </member>
+        <member name="P:StriveEngine.Udp.UdpEngine.Port">
+            <summary>
+            绑定的Udp端口。对于服务端，将会精确的绑定到指定的端口，如果端口已经被占用，则在初始化时将抛出异常；
+            对于客户端，如果指定的端口被占用，则会选取相邻的端口进行绑定，此时可以通过get属性得到其绑定的端口号。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Udp.UdpEngine.SocketSendBuffSize">
+            <summary>
+            网卡发送缓冲区大小。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Udp.UdpEngine.SocketReceiveBuffSize">
+            <summary>
+            网卡接收缓冲区大小。
+            </summary>
+        </member>
+        <member name="T:StriveEngine.Tcp.Passive.Sock5ProxyInfo">
+            <summary>
+            Sock5代理服务器的信息。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Passive.Sock5ProxyInfo.ProxyServerIP">
+            <summary>
+            代理服务器IP
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Passive.Sock5ProxyInfo.ProxyServerPort">
+            <summary>
+            代理服务器端口
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Passive.Sock5ProxyInfo.UserName">
+            <summary>
+            登陆代理服务器的用户名。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Passive.Sock5ProxyInfo.Password">
+            <summary>
+            登陆代理服务器的密码。
+            </summary>
+        </member>
+        <member name="T:StriveEngine.ICycleEngine">
+            <summary>
+            ICycleEngine 在后台线程中进行间隔循环的引擎
+            zhuweisky 2006.12.21
+            </summary>
+        </member>
+        <member name="M:StriveEngine.ICycleEngine.Start">
+            <summary>
+            Start 启动后台引擎线程
+            </summary>
+        </member>
+        <member name="M:StriveEngine.ICycleEngine.Stop">
+            <summary>
+            Stop 停止后台引擎线程，只有当线程安全退出后，该方法才返回
+            </summary>
+        </member>
+        <member name="P:StriveEngine.ICycleEngine.IsRunning">
+            <summary>
+            IsRunning 引擎是否运行中
+            </summary>
+        </member>
+        <member name="P:StriveEngine.ICycleEngine.DetectSpanInSecs">
+            <summary>
+            DetectSpanInSecs 引擎进行轮询的间隔，DetectSpanInSecs=0，表示无间隙运作引擎；DetectSpanInSecs小于0则表示不使用引擎。默认值为0。
+            </summary>
+        </member>
+        <member name="E:StriveEngine.ICycleEngine.EngineStopped">
+            <summary>
+            EngineStopped 当引擎由运行变为停止状态时，将触发此事件。如果是异常停止，则事件参数为异常对象，否则，事件参数为null。
+            </summary>
+        </member>
+        <member name="T:StriveEngine.AgileIPE">
+            <summary>
+            可xml配置的IPEndPoint。
+            </summary>
+        </member>
+        <member name="T:StriveEngine.Tcp.Server.TextContextKey">
+            <summary>
+            针对文本协议，用于封装一个TCP连接的相关信息。
+            </summary>
+        </member>
+        <member name="T:StriveEngine.Tcp.Server.IContextKey">
+            <summary>
+            用于封装一个TCP连接的相关信息。一个IContextKey实例与一个Tcp连接对应。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.BaseContextKey.NetStreamDisposed">
+            <summary>
+            NetStreamDisposed tcp连接是否已经被释放。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.BaseContextKey.UserAddress">
+            <summary>
+            UserAddress 当前连接的客户的IP地址信息
+            </summary>
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.TextContextKey.JustReadBytes(System.Int32)">
+            <summary>
+            JustReadBytes 当一次数据接收完毕时，通知ContextKey本次接收了多少字节。
+            </summary>        
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.TextContextKey.IsBufferFull">
+            <summary>
+            IsBufferFull 当前连接所使用的的接收缓冲区是否已经没有空位接收新的数据了。（这通常在接收缓冲区的尺寸比最大消息的尺寸要小所导致）
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.TextContextKey.Reset">
+            <summary>
+            Reset 将接收新数据的偏移重置到接收缓冲区的起始处。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.TextContextKey.Buffer">
+            <summary>
+            Buffer 当前连接所使用的的接收缓冲区。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.TextContextKey.OffsetForReceive">
+            <summary>
+            OffsetForReceive 从当前连接所使用的接收缓冲区的哪个偏移位置开始继续接收新来的字节。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.TextContextKey.IsWebClient">
+            <summary>
+            客户端是否为WebSocket。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.TextContextKey.MaxSizeForReceive">
+            <summary>
+            MaxSizeForReceive 当前连接所使用的接收缓冲区最多还可以接纳多少字节的数据。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.TextContextKeyParameters.EndTokens">
+            <summary>
+            消息结束标志经过编码后得到的字节数组，
+            </summary>
+        </member>
+        <member name="T:StriveEngine.Tcp.Server.GenericKMP">
+            <summary>
+            泛型KMP算法。
+            </summary>
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.GenericKMP.Next``1(``0[])">
+            <summary>
+            Next函数。之所以将Next函数暴露为public，是为了在外部可以缓存回溯函数，以供多次使用。 
+            </summary>
+            <param name="pattern">模式串</param>
+            <returns>回溯函数</returns>
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.GenericKMP.ExecuteKMP``1(``0[],``0[])">
+            <summary>
+            KMP计算
+            </summary>
+            <param name="source">主串</param>       
+            <param name="pattern">模式串</param>
+            <returns>匹配的第一个元素的索引。-1表示没有匹配</returns>
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.GenericKMP.ExecuteKMP``1(``0[],System.Int32,System.Int32,``0[])">
+            <summary>
+            KMP计算
+            </summary>
+            <param name="source">主串</param>
+            <param name="sourceOffset">主串起始偏移</param>
+            <param name="sourceCount">被查找的主串的元素个数</param>
+            <param name="pattern">模式串</param>
+            <returns>匹配的第一个元素的索引。-1表示没有匹配</returns>
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.GenericKMP.ExecuteKMP``1(``0[],``0[],System.Int32[])">
+            <summary>
+            KMP计算
+            </summary>
+            <param name="source">主串</param>       
+            <param name="pattern">模式串</param>
+            <param name="next">回溯函数</param>
+            <returns>匹配的第一个元素的索引。-1表示没有匹配</returns>
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.GenericKMP.ExecuteKMP``1(``0[],System.Int32,System.Int32,``0[],System.Int32[])">
+            <summary>
+            KMP计算
+            </summary>
+            <param name="source">主串</param>
+            <param name="sourceOffset">主串起始偏移</param>
+            <param name="sourceCount">被查找的主串的元素个数</param>
+            <param name="pattern">模式串</param>
+            <param name="next">回溯函数</param>
+            <returns>匹配的第一个元素的索引。-1表示没有匹配</returns>
+        </member>
+        <member name="T:StriveEngine.VersionType">
+            <summary>
+            版本类型。
+            </summary>
+        </member>
+        <member name="F:StriveEngine.VersionType.Free">
+            <summary>
+            免费版
+            </summary>
+        </member>
+        <member name="F:StriveEngine.VersionType.Professional">
+            <summary>
+            专业版
+            </summary>
+        </member>
+        <member name="F:StriveEngine.VersionType.Extended">
+            <summary>
+            扩展版
+            </summary>
+        </member>
+        <member name="F:StriveEngine.VersionType.Enterprise">
+            <summary>
+            企业版
+            </summary>
+        </member>
+        <member name="T:StriveEngine.Tcp.Server.TextTcpEngine">
+            <summary>
+            基于文本的TCP服务端引擎（兼容WebSocket）。    
+            </summary>
+        </member>
+        <member name="T:StriveEngine.Tcp.Server.BaseTcpEngine">
+            <summary>
+            tcp服务端引擎基础组件。  
+            </summary>
+        </member>
+        <member name="T:StriveEngine.Tcp.Server.ITcpServerEngine">
+            <summary>
+            TCP服务端引擎接口。
+            </summary>
+        </member>
+        <member name="T:StriveEngine.Core.IServerEngine">
+            <summary>
+            服务端引擎接口。
+            </summary>
+        </member>
+        <member name="M:StriveEngine.Core.IServerEngine.ChannelIsBusy(System.Net.IPEndPoint)">
+            <summary>
+            到目标客户的通道是否繁忙？
+            </summary>
+        </member>
+        <member name="M:StriveEngine.Core.IServerEngine.SendMessageToClient(System.Net.IPEndPoint,System.Byte[])">
+            <summary>
+            给某个客户端同步发信息。注意：如果引擎已经停止或客户端不在线，则直接返回。   
+            </summary>
+            <param name="client">接收数据的客户端</param>
+            <param name="msg">消息</param>
+        </member>
+        <member name="M:StriveEngine.Core.IServerEngine.SendMessageToClient(System.Net.IPEndPoint,System.Byte[],StriveEngine.ActionTypeOnChannelIsBusy)">
+            <summary>
+            给某个客户端同步发信息。注意：如果引擎已经停止或客户端不在线，则直接返回。   
+            </summary>
+            <param name="client">接收数据的客户端</param>
+            <param name="msg">消息</param>
+            <param name="action">当通道繁忙时采取的动作：继续发送或丢弃。</param>		
+        </member>
+        <member name="M:StriveEngine.Core.IServerEngine.PostMessageToClient(System.Net.IPEndPoint,System.Byte[])">
+            <summary>
+            给某个客户端异步发信息。注意：如果引擎已经停止或客户端不在线，则直接返回。   
+            </summary>
+            <param name="client">接收数据的客户端</param>
+            <param name="msg">消息</param>	
+        </member>
+        <member name="M:StriveEngine.Core.IServerEngine.PostMessageToClient(System.Net.IPEndPoint,System.Byte[],StriveEngine.ActionTypeOnChannelIsBusy)">
+            <summary>
+            给某个客户端异步发信息。注意：如果引擎已经停止或客户端不在线，则直接返回。   
+            </summary>
+            <param name="client">接收数据的客户端</param>
+            <param name="msg">消息</param>
+            <param name="action">当通道繁忙时采取的动作：继续发送或丢弃。</param>		
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.ITcpServerEngine.IsWebClient(System.Net.IPEndPoint)">
+            <summary>
+            客户端是否为WebSocket？如果返回null，表示还未接收到来自客户端的任何数据以进行判断或者是客户端不在线。
+            </summary>        
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.ITcpServerEngine.CloseClient(System.Net.IPEndPoint)">
+            <summary>
+            关闭到某个客户端的连接，将触发SomeOneDisconnected事件。
+            </summary>     
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.ITcpServerEngine.CloseAllClient">
+            <summary>
+            关闭所有客户端的连接。
+            </summary>
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.ITcpServerEngine.ChangeListenerState(System.Boolean)">
+            <summary>
+            关闭或开启监听器。该方法调用不影响网络引擎的消息接收和处理。
+            </summary>      
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.ITcpServerEngine.GetClientList">
+            <summary>
+            获取所有在线连接的客户端的地址。
+            </summary>        
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.ITcpServerEngine.IsClientOnline(System.Net.IPEndPoint)">
+            <summary>
+            客户端是否在线？
+            </summary>        
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.ITcpServerEngine.ContractFormatStyle">
+            <summary>
+            引擎所采用的协议类型（二进制、文本）。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.ITcpServerEngine.ClientCount">
+            <summary>
+            当前在线客户端的数量。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.ITcpServerEngine.MaxClientCount">
+            <summary>
+            服务器允许最大的同时在线客户端数。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.ITcpServerEngine.WriteTimeoutInMSecs">
+            <summary>
+            给每个连接发送数据超时时间（默认为-1，无限）。如果在指定的时间内未将数据发送完，则将记录异常到日志，并关闭对应的连接。
+            该属性只对同步模式发送数据有效，异步发送数据则无法设定超时时间。
+            最好给该属性赋一个有限值，因为在某些情况下，发送数据可能会导致无限阻塞。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.ITcpServerEngine.AsynMessageQueueEnabled">
+            <summary>
+            是否开启异步消息队列。默认值为false。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.ITcpServerEngine.MaxChannelCacheSize">
+            <summary>
+            每个通道连接上允许最大的等待发送【包括投递】以及正在发送的消息个数。
+            当等待发送以及正在发送的消息个数超过该值时，将关闭对应的连接。如果设置为0，则表示不作限制。默认值为0。
+            【该设置用于防止服务器为速度慢的通道缓存太多的消息，而导致服务器内存无限制增长】
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.ITcpServerEngine.IsListening">
+            <summary>
+            监听器是否开启。
+            </summary>
+        </member>
+        <member name="E:StriveEngine.Tcp.Server.ITcpServerEngine.ClientDisconnected">
+            <summary>
+            当某TCP连接断开时，触发该事件
+            </summary>
+        </member>
+        <member name="E:StriveEngine.Tcp.Server.ITcpServerEngine.ClientConnected">
+            <summary>
+            当某TCP连接建立成功时，触发此事件。
+            </summary>
+        </member>
+        <member name="E:StriveEngine.Tcp.Server.ITcpServerEngine.ClientCountChanged">
+            <summary>
+            当tcp连接数量发生变化时，触发此事件。
+            </summary>
+        </member>
+        <member name="E:StriveEngine.Tcp.Server.ITcpServerEngine.ListenerStateChanged">
+            <summary>
+            当连接监听器的状态发生变化时，触发此事件。事件参数为true，表明连接监听器启动；事件参数为false，表明连接监听器已停止。
+            </summary>
+        </member>
+        <member name="T:StriveEngine.IConnectionCountGetter">
+            <summary>
+            IConnectionCountGetter 获取当前已经存在的TCP连接数
+            </summary>
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.BaseTcpEngine.DisposeUser(StriveEngine.Tcp.Server.IContextKey)">
+            <summary>
+            对于一个连接来说，可以保证ClientDisconnected事件只触发一次
+            </summary>       
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.BaseTcpEngine.CloseClient(System.Net.IPEndPoint)">
+            <summary>
+            对于一个连接来说，只触发一次ClientDisconnected事件
+            </summary>   
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.BaseTcpEngine.SocketSendBuffSize">
+            <summary>
+            SocketSendBuffSize 网卡发送缓冲区大小。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.BaseTcpEngine.SocketReceiveBuffSize">
+            <summary>
+            SockeetReceiveBuffSize 网卡接收缓冲区大小。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.BaseTcpEngine.WriteTimeoutInMSecs">
+            <summary>
+            给每个连接发送数据超时时间（默认为-1，无限）。如果在指定的时间内未将数据发送完，则将记录异常到日志，并关闭对应的连接。
+            该属性只对同步模式发送数据有效，异步发送数据则无法设定超时时间。
+            最好给该属性赋一个有限值，因为在某些情况下，发送数据可能会导致无限阻塞。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.BaseTcpEngine.AsynMessageQueueEnabled">
+            <summary>
+            是否开启异步消息队列。默认值为false。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.BaseTcpEngine.MaxChannelCacheSize">
+            <summary>
+            每个通道连接上允许最大的等待发送【包括投递】以及正在发送的消息个数。
+            当等待发送以及正在发送的消息个数超过该值时，将关闭对应的连接。如果设置为0，则表示不作限制。默认值为0。
+            </summary>
+        </member>
+        <member name="T:StriveEngine.Core.ITextContractHelper">
+            <summary>
+            文本协议助手接口。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Core.ITextContractHelper.EndTokens">
+            <summary>
+            消息结束标识符（经过编码后得到的字节数组）的集合。
+            比如一般应用使用"\0"作为消息结束标志，那么，集合中只有一个元素（"\0"的二进制）。
+            有的应用可能有多个标识符（如"\0"、"\n"及其它）都可以作为消息的结束标志，则集合中就有多个元素。
+            如果设置为null，引擎则不进行消息完整性识别及构造，每次接收到数据，就直接触发MessageReceived事件。
+            </summary>
+        </member>
+        <member name="T:StriveEngine.Core.DefaultTextContractHelper">
+            <summary>
+            StriveEngine内置的ITextContractHelper实现。使用UTF-8对EndToken进行编码。
+            </summary>
+        </member>
+        <member name="T:StriveEngine.Tcp.TCPProxy">
+            <summary>
+            TCP 代理服务器。
+            </summary>
+        </member>
+        <member name="M:StriveEngine.Tcp.TCPProxy.#ctor(System.Int32,System.String,System.Int32)">
+            <summary>
+            CTOR
+            </summary>
+            <param name="_port">当前代理服务器所监听的端口</param>
+            <param name="_serverIP">真正的TCP服务器的IP</param>
+            <param name="_serverPort">真正的TCP服务器的端口</param>
+        </member>
+        <member name="M:StriveEngine.Tcp.TCPProxy.GetClientList">
+            <summary>
+            获取所有在线的客户端的IPE列表。
+            </summary>        
+        </member>
+        <member name="M:StriveEngine.Tcp.TCPProxy.CloseConnection(System.Net.IPEndPoint)">
+            <summary>
+            主动关闭某个客户端的连接。
+            </summary>
+            <param name="clientIPE">将被关闭客户端的IPE</param>
+        </member>
+        <member name="M:StriveEngine.Tcp.TCPProxy.GetConnectionPair(System.Net.IPEndPoint)">
+            <summary>
+            获取某个客户端对应的连接对。
+            </summary>      
+        </member>
+        <member name="E:StriveEngine.Tcp.TCPProxy.DataTransfered">
+            <summary>
+            当接收到来自服务器或客户端的消息时，触发此事件。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.TCPProxy.ServerIP">
+            <summary>
+            真正的TCP服务器的IP。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.TCPProxy.ServerPort">
+            <summary>
+            真正的TCP服务器的端口。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.TCPProxy.Port">
+            <summary>
+            当前代理服务器所监听的端口。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.TCPProxy.ProxyBufferSize">
+            <summary>
+            用于转发真实服务器发送给客户端的消息的缓冲区大小
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.TCPProxy.ClientBufferSize">
+            <summary>
+            用于转发客户端发送给真实服务器的消息的缓冲区大小
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.TCPProxy.WriteTimeoutInMSecs">
+            <summary>
+            给客户端发消息时的最大超时（毫秒）。
+            </summary>
+        </member>
+        <member name="T:StriveEngine.Tcp.ConnectionPair">
+            <summary>
+            TCP连接对。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.ConnectionPair.CreateTime">
+            <summary>
+            连接对的创建时间。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.ConnectionPair.LastDataFromClientTime">
+            <summary>
+            从客户端接收到的最后一条消息的时间。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.ConnectionPair.LastDataFromServerTime">
+            <summary>
+            从服务器接收到的最后一条消息的时间。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.ConnectionPair.BytesFromServer">
+            <summary>
+            转发的服务器发送给客户端的字节数。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.ConnectionPair.BytesFromClient">
+            <summary>
+            转发的客户端服发送给务器的字节数。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.ConnectionPair.ClientBuffer">
+            <summary>
+            用于转发客户端发送给真实服务器的消息的缓冲区
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.ConnectionPair.ProxyBuffer">
+            <summary>
+            用于转发真实服务器发送给客户端的消息的缓冲区
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.ConnectionPair.ClientStream">
+            <summary>
+            客户端与代理服务器的连接。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.ConnectionPair.ProxyStream">
+            <summary>
+            代理服务器与真实服务器的连接。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.ConnectionPair.MappingPort">
+            <summary>
+            当前ProxyStream与服务器通信的端口。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.ConnectionPair.ClientIPE">
+            <summary>
+            客户端的IPE
+            </summary>
+        </member>
+        <member name="T:StriveEngine.Tcp.Server.DataFrameHeader">
+            <summary>
+            WebSocket 数据帧头。（2个字节）
+            </summary>
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.DataFrameHeader.#ctor(System.Byte[])">
+            <summary>
+            构造函数
+            </summary>
+            <remarks>主要用于解析接收数据</remarks>
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.DataFrameHeader.#ctor(System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.SByte,System.Boolean,System.Int32)">
+            <summary>
+            构造函数
+            </summary>
+            <remarks>主要用于发送封装数据</remarks>
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.DataFrameHeader.GetBytes">
+            <summary>
+            返回帧头字节
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.DataFrameHeader.FIN">
+            <summary>
+            FIN
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.DataFrameHeader.RSV1">
+            <summary>
+            RSV1
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.DataFrameHeader.RSV2">
+            <summary>
+            RSV2
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.DataFrameHeader.RSV3">
+            <summary>
+            RSV3
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.DataFrameHeader.OpCode">
+            <summary>
+            OpCode
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.DataFrameHeader.HasMask">
+            <summary>
+            是否有掩码
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.DataFrameHeader.Length">
+            <summary>
+            Payload Length
+            </summary>
+        </member>
+        <member name="T:StriveEngine.Tcp.Server.DataFrame">
+            <summary>
+            WebSocket 数据帧
+            </summary>
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.DataFrame.Parse(System.Byte[],System.Int32,System.Int32@)">
+            <summary>
+            构造函数
+            </summary>
+            <remarks>主要用于解析接收数据</remarks>
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.DataFrame.Mask(System.Byte[],System.Byte[])">
+            <summary>
+            加掩码运算
+            </summary>
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.DataFrame.#ctor(System.Byte[],System.Boolean)">
+            <summary>
+            构造函数
+            </summary>
+            <remarks>主要用于发送封装数据</remarks>
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.DataFrame.ToStream">
+            <summary>
+            获取适合传送的字节数据
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.DataFrame.Content">
+            <summary>
+            获取真正的内容数据。
+            </summary>
+        </member>
+        <member name="T:StriveEngine.FileAgileLogger">
+            <summary>
+            FileAgileLogger 将日志记录到文本文件。线程安全。
+            </summary>
+        </member>
+        <member name="T:StriveEngine.IAgileLogger">
+            <summary>
+            IAgileLogger 用于记录日志信息。log方法不会抛出异常！
+            通常可以通过StriveEngine.Common.AdvancedFunction.SetProperty 方法来简化组件的日志记录器的装配。  
+            zhuweisky
+            </summary>
+        </member>
+        <member name="M:StriveEngine.IAgileLogger.LogSimple(System.Exception,System.String,StriveEngine.ErrorLevel)">
+            <summary>
+            LogSimple 不记录异常的堆栈位置
+            </summary>       
+        </member>
+        <member name="M:StriveEngine.Udp.IUdpClient.Send(System.Byte[],System.Net.IPEndPoint)">
+            <summary>
+            向指定的端点发送UDP数据报。
+            </summary>
+            <param name="rudeData">要发送的数据报</param>
+            <param name="endPoint">目标端点</param>        
+        </member>
+        <member name="M:StriveEngine.Udp.IUdpClient.Post(System.Byte[],System.Net.IPEndPoint)">
+            <summary>
+            向指定的端点投递UDP数据报。
+            </summary>
+            <param name="rudeData">要投递的数据报</param>
+            <param name="endPoint">目标端点</param>        
+        </member>
+        <member name="T:StriveEngine.Tcp.Server.WebSocketEngine">
+            <summary>
+            兼容WebSocket的TCP服务端二进制引擎。    
+            </summary>
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.WebSocketContextKey.JustReadBytes(System.Int32)">
+            <summary>
+            JustReadBytes 当一次数据接收完毕时，通知ContextKey本次接收了多少字节。
+            </summary>        
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.WebSocketContextKey.IsBufferFull">
+            <summary>
+            IsBufferFull 当前连接所使用的的接收缓冲区是否已经没有空位接收新的数据了。（这通常在接收缓冲区的尺寸比最大消息的尺寸要小所导致）
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.WebSocketContextKey.Reset">
+            <summary>
+            Reset 将接收新数据的偏移重置到接收缓冲区的起始处。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.WebSocketContextKey.IsWebClient">
+            <summary>
+            客户端是否为WebSocket。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.WebSocketContextKey.Buffer">
+            <summary>
+            Buffer 当前连接所使用的的接收缓冲区。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.WebSocketContextKey.OffsetForReceive">
+            <summary>
+            OffsetForReceive 从当前连接所使用的接收缓冲区的哪个偏移位置开始继续接收新来的字节。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.WebSocketContextKey.MaxSizeForReceive">
+            <summary>
+            当前连接所使用的接收缓冲区最多还可以接纳多少字节的数据。
+            </summary>
+        </member>
+        <member name="T:StriveEngine.NetworkHelper">
+            <summary>
+            网络基础功能帮助类。
+            </summary>
+        </member>
+        <member name="M:StriveEngine.NetworkHelper.GetIPList">
+            <summary>
+            获取本地的IP地址列表。根据EnableIPv6属性决定返回的IP列表中是否包含IPv6地址。
+            </summary>        
+        </member>
+        <member name="M:StriveEngine.NetworkHelper.GetIPList(System.Net.Sockets.AddressFamily)">
+            <summary>
+            获取本地的IP地址列表。参数指定IPV4或IPV6
+            </summary>        
+        </member>
+        <member name="M:StriveEngine.NetworkHelper.GetFirstIP">
+            <summary>
+            获取本地IP列表中的第一个IP地址。
+            </summary>        
+        </member>
+        <member name="M:StriveEngine.NetworkHelper.ReceiveData(System.Net.Sockets.NetworkStream,System.Int32)">
+            <summary>
+            ReceiveData 从网络读取指定长度的数据。当读取的字节数为0时，表示连接断开，并抛出IOException异常。
+            </summary>	
+        </member>
+        <member name="M:StriveEngine.NetworkHelper.ReceiveData(System.Net.Sockets.NetworkStream,System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            ReceiveData 从网络读取指定长度的数据 ，存放在buff中offset处。当读取的字节数为0时，表示连接断开，并抛出IOException异常。
+            </summary>	
+        </member>
+        <member name="M:StriveEngine.NetworkHelper.GetMinMTU">
+            <summary>
+            获取本机所有网卡的最小的MTU。
+            </summary>       
+        </member>
+        <member name="M:StriveEngine.CycleVerifier.IsOnInternet">
+            <summary>
+            连接授权服务器验证是否已经授权。如果网络异常、调用异常、或未授权都将返回false。
+            适用场合:只能在公网使用，不能用于封闭的局域网。
+            </summary>        
+        </member>
+        <member name="T:StriveEngine.AuthorizedSNChecker">
+            <summary>
+            机器信息（硬盘ID、MAC地址）验证器
+            </summary>
+        </member>
+        <member name="M:StriveEngine.AuthorizedSNChecker.CheckAuthorizedSN(System.String)">
+            <summary>
+            验证机器信息（硬盘ID、MAC地址）
+            </summary>        
+        </member>
+        <member name="M:StriveEngine.AuthorizedSNChecker.GetHardDiskID">
+            <summary>
+            取第一块硬盘编号
+            </summary>        
+        </member>
+        <member name="M:StriveEngine.AuthorizedSNChecker.GetNetCardMAC">
+            <summary>
+            获取网卡MAC地址
+            </summary>      
+        </member>
+        <member name="T:StriveEngine.Tcp.Server.ContextKeyManager">
+            <summary>
+            用于管理所有的ContextKey ,ContextKeyManager中的所有成员方法都是线程安全的。
+            zhuweisky 
+            </summary>
+        </member>
+        <member name="T:StriveEngine.Core.ProtocolType">
+            <summary>
+            传输层协议类型。
+            </summary>
+        </member>
+        <member name="T:StriveEngine.Core.ContractFormatStyle">
+            <summary>
+            协议的格式。
+            </summary>
+        </member>
+        <member name="F:StriveEngine.Core.ContractFormatStyle.Stream">
+            <summary>
+            流协议或称二进制协议。
+            </summary>
+        </member>
+        <member name="F:StriveEngine.Core.ContractFormatStyle.Text">
+            <summary>
+            文本协议，如基于xml的。
+            </summary>
+        </member>
+        <member name="T:StriveEngine.AsynOrderedExecutor`1">
+            <summary>
+            异步顺序执行器。使用Enqueue的调用线程来处理对象，保证处理的顺序为加入的顺序。
+            </summary>    
+        </member>
+        <member name="M:StriveEngine.AsynOrderedExecutor`1.WaitOnFull">
+            <summary>
+            当队列中的消息数达到最大时，则一直阻塞。
+            </summary>
+        </member>
+        <member name="M:StriveEngine.AsynOrderedExecutor`1.Enqueue(`0)">
+            <summary>
+            将消息放入到队列中，等待处理。
+            </summary>       
+        </member>
+        <member name="T:StriveEngine.AgileTcpClient">
+            <summary>
+            可xml配置的TcpClient。支持IPV6。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.AgileTcpClient.Port">
+            <summary>
+            Port 通信采用的本地端口，其值可能在GetNetworkStream方法中被修改。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.AgileTcpClient.LocalIPAddress">
+            <summary>
+            LocalIPAddress 从哪个IP发出TCP连接。如果不设置，则选用第一块网卡的地址(此时，其值在GetNetworkStream方法中被修改)
+            </summary>
+        </member>
+        <member name="P:StriveEngine.AgileTcpClient.SocketSendBuffSize">
+            <summary>
+            SocketSendBuffSize 网卡发送缓冲区大小。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.AgileTcpClient.SocketReceiveBuffSize">
+            <summary>
+            SockeetReceiveBuffSize 网卡接收缓冲区大小。
+            </summary>
+        </member>
+        <member name="T:StriveEngine.BaseCycleEngine">
+            <summary>
+            BaseCycleEngine ICycleEngine的抽象实现，循环引擎直接继承它并实现DoDetect方法即可。
+            zhuweisky 2006.12.21
+            </summary>
+        </member>
+        <member name="M:StriveEngine.BaseCycleEngine.DoDetect">
+            <summary>
+            DoDetect 每次循环时，引擎需要执行的核心动作。
+            (1)该方法不允许抛出异常。
+            (2)该方法中不允许调用BaseCycleEngine.Stop()方法，否则会导致死锁。
+            </summary>
+            <returns>返回值如果为false，表示退出引擎循环线程</returns>
+        </member>
+        <member name="M:StriveEngine.BaseCycleEngine.Stop">
+            <summary>
+            停止引擎。千万不要在DoDetect方法中调用该方法，会导致死锁，可以改用StopAsyn方法。
+            </summary>
+        </member>
+        <member name="M:StriveEngine.BaseCycleEngine.StopAsyn">
+            <summary>
+            异步停止引擎。
+            </summary>
+        </member>
+        <member name="M:StriveEngine.GlobalUtil.SetAuthorizedUser(System.String,System.String)">
+            <summary>
+            被授权的用户需要在程序初始化开始时先调用该方法注册。如果不调用此方法注册，则将以Free版本运行。        
+            </summary>     
+        </member>
+        <member name="F:StriveEngine.PasswordLevel.Administrator">
+            <summary>
+            管理密码 0 
+            </summary>
+        </member>
+        <member name="F:StriveEngine.PasswordLevel.NormalUser">
+            <summary>
+            普通用户密码 1
+            </summary>
+        </member>
+        <member name="F:StriveEngine.PasswordLevel.AuthenticUser">
+            <summary>
+            认证密码 2
+            </summary>
+        </member>
+        <member name="F:StriveEngine.ResultCode.SUCCESS">
+            <summary>
+            成功
+            </summary>
+        </member>
+        <member name="F:StriveEngine.ResultCode.OPEN_DEVICE_FAILED">
+            <summary>
+            打开设备失败 1
+            </summary>
+        </member>
+        <member name="F:StriveEngine.ResultCode.FIND_DEVICE_FAILED">
+            <summary>
+            未找到符合条件的设备 2
+            </summary>
+        </member>
+        <member name="F:StriveEngine.ResultCode.INVALID_PARAMETER">
+            <summary>
+            参数错误 3
+            </summary>
+        </member>
+        <member name="F:StriveEngine.ResultCode.INVALID_BLOCK_NUMBER">
+            <summary>
+            块号错误 4
+            </summary>
+        </member>
+        <member name="F:StriveEngine.ResultCode.HARDWARE_COMMUNICATE_ERROR">
+            <summary>
+            与硬件通信错误 5
+            </summary>
+        </member>
+        <member name="F:StriveEngine.ResultCode.INVALID_PASSWORD">
+            <summary>
+            密码错误 6
+            </summary>
+        </member>
+        <member name="F:StriveEngine.ResultCode.ACCESS_DENIED">
+            <summary>
+            没有权限 7
+            </summary>
+        </member>
+        <member name="F:StriveEngine.ResultCode.ALREADY_OPENED">
+            <summary>
+            设备已经打开 8
+            </summary>
+        </member>
+        <member name="F:StriveEngine.ResultCode.ALLOCATE_MEMORY_FAILED">
+            <summary>
+            内存分配失败 9
+            </summary>
+        </member>
+        <member name="F:StriveEngine.ResultCode.INVALID_UPDATE_PACKAGE">
+            <summary>
+            不合法的升级包 10
+            </summary>
+        </member>
+        <member name="F:StriveEngine.ResultCode.SYN_ERROR">
+            <summary>
+            线程同步错误 11
+            </summary>
+        </member>
+        <member name="F:StriveEngine.ResultCode.OTHER_ERROR">
+            <summary>
+            其它未知异常、错误 12
+            </summary>
+        </member>
+        <member name="T:StriveEngine.AuthorizationVerifier">
+            <summary>
+            StriveEngine授权验证。
+            </summary>
+        </member>
+        <member name="M:StriveEngine.AuthorizationVerifier.SetAuthorizedUser(System.String,System.String)">
+            <summary>
+            被授权的用户需要在程序初始化开始时先调用该方法注册。如果不调用此方法注册，则将以Free版本运行。        
+            </summary>       
+        </member>
+        <member name="F:StriveEngine.AuthorizationVerifyMode.UserID">
+            <summary>
+            用于按实例授权。
+            </summary>
+        </member>
+        <member name="F:StriveEngine.AuthorizationVerifyMode.PublicTokenKey">
+            <summary>
+            用于买断的情况。
+            </summary>
+        </member>
+        <member name="T:StriveEngine.Core.HeartBeatManager">
+            <summary>
+            心跳管理器，用于服务端（TCP、UDP都支持）。
+            当某个客户端心跳超时时，将触发TimeOuted事件。
+            </summary>
+        </member>
+        <member name="M:StriveEngine.Core.HeartBeatManager.#ctor(StriveEngine.Core.IServerEngine,System.Int32)">
+            <summary>
+            构造心跳管理器。
+            </summary>
+            <param name="engine">服务端引擎</param>      m>
+            <param name="surviveSpanInSecs">心跳超时间隔（秒）</param>
+        </member>
+        <member name="E:StriveEngine.Core.HeartBeatManager.TimeOuted">
+            <summary>
+            当某个客户端心跳超时时，将触发TimeOuted事件。
+            </summary>
+        </member>
+        <member name="T:StriveEngine.Tcp.Server.StreamTcpEngine">
+            <summary>
+            基于流协议的TCP服务端引擎。
+            </summary>
+        </member>
+        <member name="T:StriveEngine.NetworkEngineFactory">
+            <summary>
+            网络引擎工厂。
+            </summary>
+        </member>
+        <member name="M:StriveEngine.NetworkEngineFactory.CreateStreamTcpServerEngine(System.Int32,StriveEngine.Core.IStreamContractHelper)">
+            <summary>
+            创建使用二进制协议的TCP服务端引擎。对于返回的引擎实例，可以设置其更多属性，然后调用其Initialize方法启动引擎。
+            </summary>
+            <param name="port">服务端引擎监听的端口号</param>
+            <param name="helper">二进制协议助手接口</param>        
+        </member>
+        <member name="M:StriveEngine.NetworkEngineFactory.CreateTextTcpServerEngine(System.Int32,StriveEngine.Core.ITextContractHelper)">
+            <summary>
+            创建使用文本协议的TCP服务端引擎。对于返回的引擎实例，可以设置其更多属性，然后调用其Initialize方法启动引擎。       
+            </summary>
+            <param name="port">服务端引擎监听的端口号</param>
+            <param name="helper">文本协议助手接口</param>  
+        </member>
+        <member name="M:StriveEngine.NetworkEngineFactory.CreateStreamTcpPassivEngine(System.String,System.Int32,StriveEngine.Core.IStreamContractHelper)">
+            <summary>
+            创建使用二进制协议的TCP客户端引擎。对于返回的引擎实例，可以设置其更多属性，然后调用其Initialize方法启动引擎。
+            </summary>        
+            <param name="serverIP">要连接的服务器的IP</param> 
+            <param name="serverPort">要连接的服务器的端口</param> 
+            <param name="helper">二进制协议助手接口</param>        
+        </member>
+        <member name="M:StriveEngine.NetworkEngineFactory.CreateTextTcpPassiveEngine(System.String,System.Int32,StriveEngine.Core.ITextContractHelper)">
+            <summary>
+            创建使用文本协议的TCP客户端引擎。对于返回的引擎实例，可以设置其更多属性，然后调用其Initialize方法启动引擎。        
+            </summary>
+            <param name="serverIP">要连接的服务器的IP</param> 
+            <param name="serverPort">要连接的服务器的端口</param> 
+            <param name="helper">文本协议助手接口</param>  
+        </member>
+        <member name="M:StriveEngine.NetworkEngineFactory.CreateUdpEngine">
+            <summary>
+            创建UDP引擎。对于返回的引擎实例，可以设置其更多属性，然后调用其Initialize方法启动引擎。
+            </summary>       
+        </member>
+        <member name="T:StriveEngine.Tcp.Server.StreamContextKey">
+            <summary>
+            针对二进制协议，用于封装一个TCP连接的相关信息。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.StreamContextKey.HeaderBuffer">
+            <summary>
+            Buffer 用于接收消息头的缓冲区。
+            </summary>
+        </member>
+        <member name="M:StriveEngine.IHeartBeatChecker`1.Initialize">
+            <summary>
+            初始化并启动心跳监测器。
+            </summary>
+        </member>
+        <member name="M:StriveEngine.IHeartBeatChecker`1.RegisterOrActivate(`0)">
+            <summary>
+            注册一个新的客户端或激活它（收到心跳消息）。
+            </summary>       
+        </member>
+        <member name="M:StriveEngine.IHeartBeatChecker`1.Unregister(`0)">
+            <summary>
+            服务端主动取消对目标客户端的监测。
+            </summary>        
+        </member>
+        <member name="M:StriveEngine.IHeartBeatChecker`1.Clear">
+            <summary>
+            清空所有的监测。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.IHeartBeatChecker`1.SurviveSpanInSecs">
+            <summary>
+            在没有心跳到来时，可以存活的最长时间。SurviveSpanInSecs小于等于0，表示存活时间为无限长，而不需要进行心跳检查
+            </summary>
+        </member>
+        <member name="P:StriveEngine.IHeartBeatChecker`1.DetectSpanInSecs">
+            <summary>
+            隔多长时间进行一次状态检查。
+            </summary>
+        </member>
+        <member name="E:StriveEngine.IHeartBeatChecker`1.SomeOneTimeOuted">
+            <summary>
+            当在规定的时间内没有任何消息过来，那么将会触发该事件。
+            注意：该事件的处理函数严禁抛出任何异常。
+            </summary>
+        </member>
+        <member name="M:StriveEngine.SecurityHelper.MD5String(System.String)">
+            <summary>
+            MD5Password 对字符串进行MD5摘要计算。
+            </summary>      
+        </member>
+        <member name="M:StriveEngine.ObjectManager`2.GetAllReadonly">
+            <summary>
+            返回的列表不能被修改。【使用缓存】
+            </summary>  
+        </member>
+        <member name="M:StriveEngine.CircleQueue`1.Enqueue(`0)">
+            <summary>
+            当装满后，再加入对象，则将最老的那个对象覆盖掉。
+            </summary>        
+        </member>
+        <member name="M:StriveEngine.CircleQueue`1.Peek">
+            <summary>
+            查看队列首部的元素，但是不从队列中移除。
+            </summary>       
+        </member>
+        <member name="M:StriveEngine.CircleQueue`1.ChangeSize(System.Int32)">
+            <summary>
+            更改大小。如果当前队列中元素个数大于新的尺寸，则丢弃部分老的元素。
+            </summary>        
+        </member>
+        <member name="P:StriveEngine.CircleQueue`1.MaxCount">
+            <summary>
+            历史中最大的元素个数。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.CircleQueue`1.Size">
+            <summary>
+            最大容量。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.CircleQueue`1.Count">
+            <summary>
+            队列中的元素个数。
+            </summary>
+        </member>
+        <member name="T:StriveEngine.EventSafeTrigger">
+            <summary>
+            EventSafeTrigger 只有当事件的声明是以CbDelegate以及其泛型类型为委托类型时，才可以使用EventSafeTrigger来安全触发事件。
+            </summary>
+        </member>
+        <member name="M:StriveEngine.WebServiceHelper.InvokeWebService(System.String,System.String,System.Object[])">
+            <summary>
+            InvokeWebService 动态调用web服务
+            </summary>
+            <param name="wsUrl">WebService 地址</param>
+            <param name="methodname">方法名</param>
+            <param name="args">参数，仅仅支持简单类型</param>		
+        </member>
+        <member name="M:StriveEngine.WebServiceHelper.InvokeWebService(System.String,System.String,System.String,System.Object[])">
+            <summary>
+            InvokeWebService 动态调用web服务
+            </summary>
+        </member>
+        <member name="M:StriveEngine.WebServiceHelper.GetWsProxyType(System.String,System.String)">
+            <summary>
+            GetWsProxyType 获取目标Web服务对应的代理类型
+            </summary>
+            <param name="wsUrl">目标Web服务的url</param>
+            <param name="classname">Web服务的class名称，如果不需要指定，则传入null</param>      
+        </member>
+        <member name="M:StriveEngine.ApplicationHelper.StartApplication(System.String)">
+            <summary>
+            StartApplication 启动一个应用程序/进程
+            </summary>       
+        </member>
+        <member name="M:StriveEngine.ApplicationHelper.IsAppInstanceExist(System.String)">
+            <summary>
+            IsAppInstanceExist 目标应用程序是否已经启动。通常用于判断单实例应用。将占用锁。
+            </summary>       
+        </member>
+        <member name="M:StriveEngine.ApplicationHelper.ReleaseAppInstance(System.String)">
+            <summary>
+            释放由IsAppInstanceExist占用的锁。
+            </summary>        
+        </member>
+        <member name="M:StriveEngine.ApplicationHelper.OpenUrl(System.String)">
+            <summary>
+            OpenUrl 在浏览器中打开wsUrl链接
+            </summary>        
+        </member>
+        <member name="T:StriveEngine.Udp.IPv6UdpClient">
+            <summary>
+            兼容IPv6的UdpClient。
+            </summary>
+        </member>
+        <member name="E:StriveEngine.Udp.IPv6UdpClient.EngineException">
+            <summary>
+            当引擎出现异常时（将导致引擎停止工作），将触发该事件。
+            </summary>
+        </member>
+        <member name="T:StriveEngine.AgileTcpListener">
+            <summary>
+            用于封装TCP监听者及监听线程。支持IPV6。
+            zhuweisky 2005.05.23
+            </summary>
+        </member>
+        <member name="M:StriveEngine.AgileTcpListener.FillKeepAliveStruct(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            FillKeepAliveStruct 得到Keep-Alive结构值
+            </summary>
+            <param name="onOff">是否启用Keep-Alive</param>
+            <param name="keepAliveTimeInMSec">最大存活时间ms</param>
+            <param name="keepAliveIntervalInMSec">探测时间间隔ms</param>
+            <returns></returns>
+        </member>
+        <member name="E:StriveEngine.AgileTcpListener.TcpConnectionEstablished">
+            <summary>
+            当新的Tcp连接成功建立时，会触发此事件	
+            </summary>
+        </member>
+        <member name="P:StriveEngine.AgileTcpListener.AsynConnectionEvent">
+            <summary>
+            异步引发连接成功的事件。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.AgileTcpListener.SocketSendBuffSize">
+            <summary>
+            Socket(网卡)发送缓冲区的大小。默认为8k。
+            </summary>
+        </member>
+        <member name="P:StriveEngine.AgileTcpListener.SocketReceiveBuffSize">
+            <summary>
+            SockeetReceiveBuffSize 网卡接收缓冲区大小。
+            </summary>
+        </member>
+        <member name="F:StriveEngine.AuthorizeType.NormalInstance">
+            <summary>
+            如果在封闭的局网，可正常启动；一旦连接到公网，则验证授权，授权通过后，才能继续正常工作。
+            </summary>
+        </member>
+        <member name="F:StriveEngine.AuthorizeType.PublicTokenKey">
+            <summary>
+            适用于买断的情况
+            </summary>
+        </member>
+        <member name="F:StriveEngine.AuthorizeType.JustOnInternet">
+            <summary>
+            只能在公网运行（必须通过授权服务器验证后，才能启动）
+            </summary>
+        </member>
+        <member name="F:StriveEngine.AuthorizeType.SecurityDog">
+            <summary>
+            使用加密狗才可启动。
+            </summary>
+        </member>
+        <member name="F:StriveEngine.AuthorizeType.AuthorizedSN">
+            <summary>
+            授权序列（硬盘和mac相关信息）
+            </summary>
+        </member>
+        <member name="T:StriveEngine.Tcp.Server.Handshake">
+            <summary>
+            WebSokect 握手协议。
+            </summary>
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.Handshake.#ctor(System.String)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="request">请求串</param>
+        </member>
+        <member name="M:StriveEngine.Tcp.Server.Handshake.GetValue(System.String)">
+            <summary>
+            根据键获取对应值
+            </summary>
+            <param name="key">键</param>
+            <returns></returns>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.Handshake.KeyAccept">
+            <summary>
+            返回的验证码
+            </summary>
+        </member>
+        <member name="P:StriveEngine.Tcp.Server.Handshake.Response">
+            <summary>
+            响应串
+            </summary>
+        </member>
+        <member name="T:StriveEngine.ActionTypeOnChannelIsBusy">
+            <summary>
+            当通道繁忙时，发送数据所采取的操作。
+            </summary>
+        </member>
+        <member name="F:StriveEngine.ActionTypeOnChannelIsBusy.Continue">
+            <summary>
+            继续发送（排队）。
+            </summary>
+        </member>
+        <member name="F:StriveEngine.ActionTypeOnChannelIsBusy.Discard">
+            <summary>
+            丢弃消息
+            </summary>
+        </member>
+        <member name="T:StriveEngine.AgileCycleEngine">
+            <summary>
+            AgileCycleEngine 通过组合使用的循环引擎
+            </summary>
+        </member>
+        <member name="M:StriveEngine.IEngineActor.EngineAction">
+            <summary>
+            EngineAction 执行引擎动作，返回false表示停止引擎。
+            注意，该方法不能抛出异常，否则会导致引擎停止运行（循环线程遭遇异常退出）。
+            </summary>       
+        </member>
+        <member name="T:StriveEngine.Core.IStreamContractHelper">
+            <summary>
+            二进制协议助手接口。
+            </summary>
+        </member>
+        <member name="M:StriveEngine.Core.IStreamContractHelper.ParseMessageBodyLength(System.Byte[])">
+            <summary>
+            从消息头中解析出消息体的长度（注意，不是整个消息的长度，而是不包含消息头的Body的长度）。
+            </summary>
+            <param name="head">完整的消息头，长度固定为MessageHeaderLength</param>
+            <returns></returns>
+        </member>
+        <member name="P:StriveEngine.Core.IStreamContractHelper.MessageHeaderLength">
+            <summary>
+            消息头的长度。
+            </summary>
+        </member>
+    </members>
+</doc>

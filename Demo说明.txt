@@ -1,0 +1,13 @@
+该Demo总共包括三个项目：
+
+1.StriveEngine.SimpleDemoServer：基于StriveEngine开发的服务端。
+
+2.StriveEngine.SimpleDemoClient：基于StriveEngine开发的客户端。
+
+3.StriveEngine.SimpleDemo：直接基于.NET的Socket开发的客户端，其目的是为了演示：在客户端不使用StriveEngine的情况下，如何与基于StriveEngine的服务端进行通信。
+
+关于StriveEngine的详细介绍，请参见 http://blog.oraycn.com/StriveEngine.aspx
+
+ * 更多实用组件请访问 www.oraycn.com 或 QQ：168757008。
+ * 
+ * ESFramework 强悍的通信框架、P2P框架、群集平台。OMCS 简单易用的网络语音视频框架。MFile 语音视频录制组件。StriveEngine 轻量级的通信引擎。
