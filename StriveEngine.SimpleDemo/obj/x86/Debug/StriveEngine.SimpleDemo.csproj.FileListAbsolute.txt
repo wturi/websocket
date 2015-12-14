@@ -41,3 +41,10 @@ C:\Users\david\Downloads\打通BS与CS的Demo源码\StriveEngine.SimpleDemo\obj\
 C:\Users\david\Downloads\打通BS与CS的Demo源码\StriveEngine.SimpleDemo\obj\x86\Debug\StriveEngine.SimpleDemo.csproj.GenerateResource.Cache
 C:\Users\david\Downloads\打通BS与CS的Demo源码\StriveEngine.SimpleDemo\obj\x86\Debug\StriveEngine.SimpleDemo.exe
 C:\Users\david\Downloads\打通BS与CS的Demo源码\StriveEngine.SimpleDemo\obj\x86\Debug\StriveEngine.SimpleDemo.pdb
+D:\Projects\WebSocket\StriveEngine.SimpleDemo\bin\Debug\StriveEngine.SimpleDemo.exe
+D:\Projects\WebSocket\StriveEngine.SimpleDemo\bin\Debug\StriveEngine.SimpleDemo.pdb
+D:\Projects\WebSocket\StriveEngine.SimpleDemo\obj\x86\Debug\StriveEngine.SimpleDemo.Form1.resources
+D:\Projects\WebSocket\StriveEngine.SimpleDemo\obj\x86\Debug\StriveEngine.SimpleDemo.Properties.Resources.resources
+D:\Projects\WebSocket\StriveEngine.SimpleDemo\obj\x86\Debug\StriveEngine.SimpleDemo.csproj.GenerateResource.Cache
+D:\Projects\WebSocket\StriveEngine.SimpleDemo\obj\x86\Debug\StriveEngine.SimpleDemo.exe
+D:\Projects\WebSocket\StriveEngine.SimpleDemo\obj\x86\Debug\StriveEngine.SimpleDemo.pdb
