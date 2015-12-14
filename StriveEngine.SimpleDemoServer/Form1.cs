@@ -134,7 +134,7 @@ namespace StriveEngine.SimpleDemoServer
                     return;
                 }
 
-                string msg = this.textBox_msg.Text + "\0";// "\0" 表示一个消息的结尾
+                string msg = this.textBox_msg.Text + "";// "\0" 表示一个消息的结尾
                 byte[] bMsg = System.Text.Encoding.UTF8.GetBytes(msg);//消息使用UTF-8编码
                 this.tcpServerEngine.SendMessageToClient(client, bMsg);
             }
@@ -156,7 +156,7 @@ namespace StriveEngine.SimpleDemoServer
                 if (this.tcpServerEngine.ClientCount > 0)
                 {
                     List<IPEndPoint> lists = this.tcpServerEngine.GetClientList();
-                    string msg = this.textBox_msg.Text + "\0";
+                    string msg = this.textBox_msg.Text + "";
                     byte[] bMsg = System.Text.Encoding.UTF8.GetBytes(msg);
                     foreach (IPEndPoint list in lists)
                     {
