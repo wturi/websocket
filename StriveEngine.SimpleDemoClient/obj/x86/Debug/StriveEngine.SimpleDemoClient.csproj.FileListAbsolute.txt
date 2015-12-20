@@ -54,7 +54,6 @@ D:\Projects\WebSocket\StriveEngine.SimpleDemoClient\bin\Debug\StriveEngine.Simpl
 D:\Projects\WebSocket\StriveEngine.SimpleDemoClient\bin\Debug\StriveEngine.SimpleDemoClient.pdb
 D:\Projects\WebSocket\StriveEngine.SimpleDemoClient\bin\Debug\StriveEngine.dll
 D:\Projects\WebSocket\StriveEngine.SimpleDemoClient\bin\Debug\StriveEngine.xml
-D:\Projects\WebSocket\StriveEngine.SimpleDemoClient\obj\x86\Debug\StriveEngine.SimpleDemoClient.csprojResolveAssemblyReference.cache
 D:\Projects\WebSocket\StriveEngine.SimpleDemoClient\obj\x86\Debug\StriveEngine.SimpleDemoClient.Form1.resources
 D:\Projects\WebSocket\StriveEngine.SimpleDemoClient\obj\x86\Debug\StriveEngine.SimpleDemoClient.Properties.Resources.resources
 D:\Projects\WebSocket\StriveEngine.SimpleDemoClient\obj\x86\Debug\StriveEngine.SimpleDemoClient.csproj.GenerateResource.Cache
