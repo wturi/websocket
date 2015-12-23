@@ -43,6 +43,7 @@ namespace StriveEngine.SimpleDemoServer
                 m.PairingUserID = jsons[6].Split(':')[1];
                 m.PairingServiceIP = null;
                 m.PairingUserIP = null;
+                m.Headimgurl = jsons[9].Split(':')[1];
                 if (serviceip != "")
                 {
                     serviceip = jsons[7].Split(':')[1] + ":" + jsons[7].Split(':')[2];

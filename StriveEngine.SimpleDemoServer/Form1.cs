@@ -20,6 +20,7 @@ namespace StriveEngine.SimpleDemoServer
      */
     public partial class Form1 : Form
     {
+
         private ITcpServerEngine tcpServerEngine;
         private Messages msgobj = new Models.Messages();
         private IPEndPoint ServiceIP;
@@ -166,10 +167,10 @@ namespace StriveEngine.SimpleDemoServer
                     this.msgobj.PairingServiceIP = this.ServiceIP;
                     this.msgobj.PairingUserIP = client;
 
-
                     if (this.msgobj.IsFirst == false)
                     {
                         this.msgobj.PairingUserIP = client;
+
                         this.BeginInvoke(new CbDelegate<IPEndPoint, string>(this.ShowClientMsg), client, msg);
                         //发送对应人员
                         //private string jsonstr = "{\"NickID\":\"{0}\",\"NickName\":\"{1}\",\"Msg\":\"{2}\",\"IsFirst\":{3},\"IsUser\":{4},\"PairingServiceID\":\"{5}\",\"PairingUserID\": \"{6}\",\"PairingServiceIP\":\"{7}\",\"PairingUserIP\":\"{8}\"}";
@@ -282,7 +283,6 @@ namespace StriveEngine.SimpleDemoServer
                 MessageBox.Show(ee.Message);
             }
         }
-
 
 
 
