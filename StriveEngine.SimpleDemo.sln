@@ -1,9 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StriveEngine.SimpleDemo", "StriveEngine.SimpleDemo\StriveEngine.SimpleDemo.csproj", "{4874F970-E10D-4CB3-BF04-34A7439426A1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E3646651-417A-4B5C-B0F6-61B89F33E5B4} = {E3646651-417A-4B5C-B0F6-61B89F33E5B4}
+		{1C031C74-811E-4914-B562-F347994D4AC5} = {1C031C74-811E-4914-B562-F347994D4AC5}
+		{9972DCCB-EEF7-410A-BB79-49BF0413A9AE} = {9972DCCB-EEF7-410A-BB79-49BF0413A9AE}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StriveEngine.SimpleDemoServer", "StriveEngine.SimpleDemoServer\StriveEngine.SimpleDemoServer.csproj", "{9972DCCB-EEF7-410A-BB79-49BF0413A9AE}"
 EndProject
