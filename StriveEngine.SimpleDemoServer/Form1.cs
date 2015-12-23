@@ -141,7 +141,7 @@ namespace StriveEngine.SimpleDemoServer
                         this.msgobj.PairingServiceIP = client;
                         //发送对应人员
                         //private string jsonstr = "{\"NickID\":\"{0}\",\"NickName\":\"{1}\",\"Msg\":\"{2}\",\"IsFirst\":{3},\"IsUser\":{4},\"PairingServiceID\":\"{5}\",\"PairingUserID\": \"{6}\",\"PairingServiceIP\":\"{7}\",\"PairingUserIP\":\"{8}\"}";
-                        json = "{" + string.Format("\"NickID\":\"{0}\",\"NickName\":\"{1}\",\"Msg\":\"{2}\",\"IsFirst\":\"{3}\",\"IsUser\":\"{4}\",\"PairingServiceID\":\"{5}\",\"PairingUserID\": \"{6}\",\"PairingServiceIP\":\"{7}\",\"PairingUserIP\":\"{8}\"",
+                        json = "{" + string.Format("\"NickID\":\"{0}\",\"NickName\":\"{1}\",\"Msg\":\"{2}\",\"IsFirst\":\"{3}\",\"IsUser\":\"{4}\",\"PairingServiceID\":\"{5}\",\"PairingUserID\": \"{6}\",\"PairingServiceIP\":\"{7}\",\"PairingUserIP\":\"{8}\",\"Headimgurl\":\"{9}\"",
                                                     this.msgobj.NickID,
                                                     this.msgobj.NickName,
                                                     this.msgobj.Msg,
@@ -150,7 +150,8 @@ namespace StriveEngine.SimpleDemoServer
                                                     this.msgobj.PairingServiceID,
                                                     this.msgobj.PairingUserID,
                                                     this.msgobj.PairingServiceIP.ToString(),
-                                                    this.msgobj.PairingUserIP.ToString()
+                                                    this.msgobj.PairingUserIP.ToString(),
+                                                    this.msgobj.Headimgurl
                                                    ) + "}";
 
                         byte[] bMsg = Encoding.UTF8.GetBytes(json);//消息使用UTF-8编码
@@ -172,7 +173,7 @@ namespace StriveEngine.SimpleDemoServer
                         this.BeginInvoke(new CbDelegate<IPEndPoint, string>(this.ShowClientMsg), client, msg);
                         //发送对应人员
                         //private string jsonstr = "{\"NickID\":\"{0}\",\"NickName\":\"{1}\",\"Msg\":\"{2}\",\"IsFirst\":{3},\"IsUser\":{4},\"PairingServiceID\":\"{5}\",\"PairingUserID\": \"{6}\",\"PairingServiceIP\":\"{7}\",\"PairingUserIP\":\"{8}\"}";
-                        string json = "{" + string.Format("\"NickID\":\"{0}\",\"NickName\":\"{1}\",\"Msg\":\"{2}\",\"IsFirst\":\"{3}\",\"IsUser\":\"{4}\",\"PairingServiceID\":\"{5}\",\"PairingUserID\": \"{6}\",\"PairingServiceIP\":\"{7}\",\"PairingUserIP\":\"{8}\"",
+                        string json = "{" + string.Format("\"NickID\":\"{0}\",\"NickName\":\"{1}\",\"Msg\":\"{2}\",\"IsFirst\":\"{3}\",\"IsUser\":\"{4}\",\"PairingServiceID\":\"{5}\",\"PairingUserID\": \"{6}\",\"PairingServiceIP\":\"{7}\",\"PairingUserIP\":\"{8}\",\"Headimgurl\":\"{9}\"",
                                                     this.msgobj.NickID,
                                                     this.msgobj.NickName,
                                                     this.msgobj.Msg,
@@ -181,7 +182,8 @@ namespace StriveEngine.SimpleDemoServer
                                                     this.msgobj.PairingServiceID,
                                                     this.msgobj.PairingUserID,
                                                     this.msgobj.PairingServiceIP.ToString(),
-                                                    this.msgobj.PairingUserIP.ToString()
+                                                    this.msgobj.PairingUserIP.ToString(),
+                                                    this.msgobj.Headimgurl
                                                    ) + "}";
 
                         byte[] bMsg = Encoding.UTF8.GetBytes(json);//消息使用UTF-8编码

@@ -16,5 +16,6 @@ namespace StriveEngine.SimpleDemoServer.Models
         public string PairingUserID { get; set; }
         public IPEndPoint PairingServiceIP { get; set; }
         public IPEndPoint PairingUserIP { get; set; }
+        public string Headimgurl { get; set; }
     }
 }
